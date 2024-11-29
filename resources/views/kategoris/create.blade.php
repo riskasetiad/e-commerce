@@ -1,26 +1,35 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">Tambah Data Kategori</div>
-                    <div class="card-body">
-                        <form action="{{route('kategori.store')}}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <div class="mb-3">
-                                <label class="form-label">Kategori</label>
-                                <input type="text" class="form-control @error('nama_kategori') is-invalid @enderror" name="nama_kategori">
-                                @error('nama_kategori')
-                                    <span class="invalid-feedback">{{ $message }}</span>
-                                @enderror
-                            </div>
-                            <div class="mb-3">
-                                <a href="{{ url('produk') }}" class="btn btn-primary">Kembali</a>
-                                <button type="submit" class="btn btn-primary">Simpan</button>
-                        </form>
-                    </div>
+    <div class="container mx-auto">
+        <div class="flex justify-center">
+            <div class="w-full py-3">
+                <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                    <h5 class="bg-gray-200 px-6 py-3 font-bold">Tambah Data Kategori</h5>
+                    <form action="{{ route('kategori.store') }}" method="POST" enctype="multipart/form-data" class="px-6 py-4">
+                        @csrf
+
+                        <!-- Nama Kategori Input -->
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Nama Kategori</label>
+                            <input type="text" name="nama_kategori"
+                                class="border rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring focus:border-blue-300 @error('nama_kategori') border-red-500 @enderror"
+                                value="{{ old('nama_kategori') }}">
+
+                            <!-- Error Message -->
+                            @error('nama_kategori')
+                                <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex items-center justify-between">
+                            <a href="{{ url('kategori') }}"
+                                class="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded focus:outline-none">Kembali</a>
+                            <button type="submit"
+                                class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded focus:outline-none">Simpan</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

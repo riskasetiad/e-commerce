@@ -13,7 +13,7 @@ class KategoriController extends Controller
      */
     public function index()
     {
-        $kategori = kategori::all();
+        $kategori = kategori::paginate(5);
         confirmDelete('Hapus!', 'Anda yakin ingin menghapusnya?');
         return view('kategoris/index', compact('kategori'));
     }

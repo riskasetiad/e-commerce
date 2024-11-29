@@ -14,7 +14,7 @@ class ProdukController extends Controller
      */
     public function index()
     {
-        $produk = produk::all();
+        $produk = Produk::paginate(5);
         confirmDelete('Hapus!', 'Anda yakin ingin menghapusnya?');
         return view('produks/index', compact('produk'));
 
@@ -40,12 +40,12 @@ class ProdukController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'cover' => 'required',
+            'cover' => 'required|mimes:jpg,jpeg,png|max:65535',
             'nama_produk' => 'required',
             'id_kategori' => 'required',
             'stok' => 'required|numeric|min:1',
             'harga' => 'required|numeric|min:1',
-            'deskripsi' => 'required',
+            'deskripsi' => 'required|string',
         ], [
             'cover.required' => 'Foto harus diisi!',
             'nama_produk.required' => 'Nama Produk harus diisi!',
@@ -114,12 +114,12 @@ class ProdukController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'cover' => 'required',
+            'cover' => 'mimes:jpg,jpeg,png|max:65535',
             'nama_produk' => 'required',
             'id_kategori' => 'required',
             'stok' => 'required|numeric|min:1',
             'harga' => 'required|numeric|min:1',
-            'deskripsi' => 'required',
+            'deskripsi' => 'required|string',
         ], [
             'cover.required' => 'Foto harus diisi!',
             'nama_produk.required' => 'Nama Produk harus diisi!',
@@ -160,11 +160,10 @@ class ProdukController extends Controller
      */
     public function destroy($id)
     {
-        $produk = produk::findOrFail($id);
+       $produk = produk::findOrFail($id);
+       $produk->delete();
         $produk->deleteImage();
-        $produk->delete();
         Alert::success('Success', 'Data Berhasil Dihapus!')->autoClose(1000);
         return redirect()->route('produk.index');
-
     }
 }

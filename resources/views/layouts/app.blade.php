@@ -16,73 +16,121 @@
 
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp,container-queries"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
 
 </head>
 
 <body>
     <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+        <nav class="bg-white py-3 sticky-top">
+            <div class="container mx-auto flex justify-between items-center">
+                <!-- Left Side Of Navbar (Logo Laravel dan Links) -->
+                <div class="flex items-center space-x-8">
+                    <a class="text-lg" href="{{ url('/') }}">
+                        {{ config('app.name', 'Laravel') }}
+                    </a>
 
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/produk/">Produk</a>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/kategori/">Kategori</a>
-                        </li>
-                    </ul>
+                    <!-- Right Side Of Navbar (Link Produk, Kategori, Hobi di Layar Besar) -->
+                    @auth
+                        <div class="hidden sm:flex items-center space-x-4" id="navMenu">
+                            @can('manage produk')
+                                <a class="" href="/produk/">Produk</a>
+                            @endcan
+                            @can('manage kategori')
+                                <a class="" href="/kategori/">Kategori</a>
+                            @endcan
+                            @can('manage hobi')
+                                <a class="" href="/hobi/">Hobi</a>
+                            @endcan
+                        </div>
+                    @endauth
+                </div>
 
-                    <!-- Right Side Of Navbar -->
-                    <ul class="navbar-nav ms-auto">
-                        <!-- Authentication Links -->
-                        @guest
-                            @if (Route::has('login'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                                </li>
-                            @endif
+                <!-- User Menu -->
+                <div class="relative">
+                    @guest
+                        @if (Route::has('login'))
+                            <a class="" href="{{ route('login') }}">{{ __('Login') }}</a>
+                        @endif
+                        @if (Route::has('register'))
+                            <a class="ml-4 text-gray-700" href="{{ route('register') }}">{{ __('Register') }}</a>
+                        @endif
+                    @else
+                        <!-- Dropdown User Menu untuk Desktop -->
+                        <div class="hidden sm:flex relative">
+                            <button id="desktopUserMenuButton" class="focus:outline-none">
+                                {{ Auth::user()->name }}
+                            </button>
+                            <!-- Dropdown Desktop -->
+                            <div id="desktopUserMenu" class="absolute hidden mt-3 bg-white z-10 -right-5">
 
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li>
-                            @endif
-                        @else
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
-                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }}
+                                <a class="block hover:text-blue-600 px-3 py-2" href="/profile">Profile</a>
+
+                                <a class="block hover:text-red-600 px-3 py-2" href="{{ route('logout') }}"
+                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    {{ __('Logout') }}
                                 </a>
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+                                    @csrf
+                                </form>
+                            </div>
+                        </div>
+                    @endguest
+                </div>
 
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                        onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
-                                    </a>
-
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
-                                </div>
-                            </li>
-                        @endguest
-                    </ul>
+                <!-- Burger Menu Button (Muncul di Layar Kecil) -->
+                <div class="sm:hidden flex items-center">
+                    <button id="burgerButton" class="focus:outline-none text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
+
+            <!-- Mobile Menu -->
+            <div class="hidden sm:hidden" id="mobileMenu">
+                <a href="/produk/" class="block px-4 py-2">Produk</a>
+                <a href="/kategori/" class="block px-4 py-2">Kategori</a>
+                <a href="/hobi/" class="block px-4 py-2">Hobi</a>
+                @auth
+                    <div class="py-2 border-t">
+                        <a href="/profile" class="block px-4 py-2 hover:bg-gray-300">Profile</a>
+                        <a href="{{ route('logout') }}"
+                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                            class="block px-4 py-2 hover:bg-gray-300">Logout</a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+                            @csrf
+                        </form>
+                    </div>
+                @endauth
+            </div>
+
+            <script>
+                // Toggle untuk mobile menu
+                document.getElementById('burgerButton').addEventListener('click', function() {
+                    document.getElementById('mobileMenu').classList.toggle('hidden');
+                });
+
+                // Toggle untuk dropdown user menu di desktop
+                document.getElementById('desktopUserMenuButton').addEventListener('click', function() {
+                    document.getElementById('desktopUserMenu').classList.toggle('hidden');
+                });
+            </script>
+            <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+            <script>
+                $(document).ready(function() {
+                    $('.select-multiple').select2();
+                });
+            </script>
         </nav>
 
-        <main class="py-4">
+        <main class="">
             @yield('content')
         </main>
     </div>

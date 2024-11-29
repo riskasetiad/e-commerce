@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Providers\RouteServiceProvider;
 use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
@@ -19,7 +21,7 @@ class RegisterController extends Controller
     | validation and creation. By default this controller uses a trait to
     | provide this functionality without requiring any additional code.
     |
-    */
+     */
 
     use RegistersUsers;
 
@@ -28,7 +30,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/profile/create';
 
     /**
      * Create a new controller instance.
@@ -63,10 +65,21 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+        $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
+
+        $user->assignRole('user');
+        return $user;
+    }
+    protected function registered(Request $request, User $user)
+    {
+       if ($user->hasRole('user')) {
+            return redirect()->route('profile.create');  // Mengarahkan ke halaman profil setelah registrasi
+        }
+
+        return redirect($this->redirectTo);
     }
 }
